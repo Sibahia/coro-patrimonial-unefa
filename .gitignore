@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment variables (never commit real secrets)
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Uploads: only placeholders and the APK manifest are versioned
+projects/backend/uploads/*
+!projects/backend/uploads/images/
+!projects/backend/uploads/documents/
+!projects/backend/uploads/audios/
+!projects/backend/uploads/apks/
+projects/backend/uploads/images/*
+!projects/backend/uploads/images/.gitkeep
+projects/backend/uploads/documents/*
+!projects/backend/uploads/documents/.gitkeep
+projects/backend/uploads/audios/*
+!projects/backend/uploads/audios/.gitkeep
+projects/backend/uploads/apks/*
+!projects/backend/uploads/apks/version.json
+
+# Legacy binary backup (not part of the public repository)
+projects/backend/backup.doc
+
+# Build / coverage output
+dist/
+build/
+coverage/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Tooling
+.fnmatched
