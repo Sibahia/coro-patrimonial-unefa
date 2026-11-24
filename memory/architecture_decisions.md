@@ -33,3 +33,11 @@ Historial de decisiones de diseño del proyecto Coro Patrimonial UNEFA.
 **Decisión:** No versionar `.env`, `node_modules`, logs ni `projects/backend/backup.doc` (binario sin identificar). En `uploads/` solo se versiona `apks/version.json`.
 
 **Motivo:** El repo es público; evitar exposición de secretos y contenido desconocido.
+
+## AD-006 — Imágenes de monumentos (2026-11-24)
+
+**Decisión:** Los endpoints `POST /api/monuments` y `PUT /api/monuments/:id` aceptan imágenes en el campo multipart `images` (jpg, jpeg, png, webp), las guardan en `/uploads/images/` con nombre `<timestamp>-<random>.<ext>` y añaden las URLs al array `images`. En `PUT` se usa `$push` para conservar las imágenes previas; si falla la operación, se eliminan los archivos recién guardados.
+
+**Motivo:** Mantener el historial fotográfico del monumento y evitar colisiones de nombres y archivos huérfanos.
+
+**Consecuencia:** El campo `images` de `req.body` queda reservado para URLs existentes en `POST`; en `PUT` se ignora cuando hay archivos subidos.
