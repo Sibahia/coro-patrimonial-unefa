@@ -19,6 +19,7 @@ import memberRoutes from '../api/members/routes.js';
 import workRoutes from '../api/works/routes.js';
 import eventRoutes from '../api/events/routes.js';
 import heritageRoutes from '../api/heritage/routes.js';
+import monumentRoutes from '../api/monuments/monument.routes.js';
 import uploadRoutes from '../api/uploads/routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -95,6 +96,7 @@ class WebServer {
     this.app.use('/api/works', workRoutes);
     this.app.use('/api/events', eventRoutes);
     this.app.use('/api/heritage', heritageRoutes);
+    this.app.use('/api/monuments', monumentRoutes);
     this.app.use('/api/uploads', uploadRoutes);
   }
 

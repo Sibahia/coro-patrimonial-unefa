@@ -60,3 +60,19 @@ export const heritageRules = [
   body('year').optional({ nullable: true }).isInt().withMessage('Año inválido'),
   body('tags').optional().isArray().withMessage('Tags debe ser una lista')
 ];
+
+export const monumentRules = [
+  body('title').trim().notEmpty().withMessage('El título es obligatorio'),
+  body('code').trim().notEmpty().withMessage('El código es obligatorio'),
+  body('category').isIn(['Religioso', 'Civil', 'Militar', 'Plaza', 'Museo']).withMessage('Categoría inválida'),
+  body('period').optional({ nullable: true }).isString().trim(),
+  body('constructionType').isIn(['Tapia', 'Adobe', 'Bahareque', 'Mampostería']).withMessage('Tipo de construcción inválido'),
+  body('location.lat').optional({ nullable: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitud inválida'),
+  body('location.lng').optional({ nullable: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitud inválida'),
+  body('location.address').optional({ nullable: true }).isString().trim(),
+  body('history').optional({ nullable: true }).isString(),
+  body('images').optional().isArray().withMessage('Las imágenes deben ser una lista'),
+  body('images.*').optional().isString().withMessage('Cada imagen debe ser una ruta de texto'),
+  body('audioGuideUrl').optional({ nullable: true }).isString().trim(),
+  body('status').optional().isIn(['Excelente', 'Regular', 'Deteriorado', 'Critico']).withMessage('Estado inválido')
+];
