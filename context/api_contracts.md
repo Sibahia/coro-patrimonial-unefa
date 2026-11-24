@@ -34,6 +34,10 @@ Contrato de la API REST y eventos Socket.IO. Base URL: `/api`. Todas las respues
 | POST | `/api/uploads` | Subir archivo (`multipart/form-data`, campo `file`, `folder`) | editor+ |
 | GET | `/uploads/:folder/:file` | Entregar archivo estático | public |
 
+### Subida de imágenes en monumentos
+
+`POST /api/monuments` y `PUT /api/monuments/:id` aceptan `multipart/form-data` con el campo de archivos `images` (uno o varios). Las extensiones permitidas son `jpg`, `jpeg`, `png` y `webp`; los archivos se guardan en `/uploads/images/` con nombre `<timestamp>-<random>.<ext>` y sus URLs se añaden a `images`. En `PUT` las imágenes nuevas se agregan a las existentes.
+
 ## Eventos Socket.IO
 
 | Evento | Payload | Descripción |
