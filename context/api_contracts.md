@@ -29,6 +29,8 @@ Contrato de la API REST y eventos Socket.IO. Base URL: `/api`. Todas las respues
 | GET/PUT/DELETE | `/api/events/:id` | Detalle / editar / retirar | public GET, editor+ |
 | GET/POST | `/api/heritage` | Listar / crear piezas | public GET, editor+ POST |
 | GET/PUT/DELETE | `/api/heritage/:id` | Detalle / editar / retirar | public GET, editor+ |
+| GET/POST | `/api/monuments` | Listar / crear monumentos | public GET, editor+ POST |
+| GET/PUT/DELETE | `/api/monuments/:id` | Detalle / editar / retirar | public GET, editor+ |
 | POST | `/api/uploads` | Subir archivo (`multipart/form-data`, campo `file`, `folder`) | editor+ |
 | GET | `/uploads/:folder/:file` | Entregar archivo estático | public |
 
