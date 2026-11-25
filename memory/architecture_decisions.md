@@ -41,3 +41,31 @@ Historial de decisiones de diseño del proyecto Coro Patrimonial UNEFA.
 **Motivo:** Mantener el historial fotográfico del monumento y evitar colisiones de nombres y archivos huérfanos.
 
 **Consecuencia:** El campo `images` de `req.body` queda reservado para URLs existentes en `POST`; en `PUT` se ignora cuando hay archivos subidos.
+
+## AD-007 — Middleware de autenticación y endurecimiento JWT (2026-11-24)
+
+**Decisión:** El middleware se llama `projects/backend/middlewares/auth.middleware.js` (se renombró desde `auth.js` y se actualizaron los 8 imports). Exporta `requireAuth`, `optionalAuth` y `requireRole`. El parseo de `Authorization` acepta solo `Bearer <token>` (insensible a mayúsculas, sin tokens vacíos), distingue 401 por JWT de 500 por error de base de datos y rechaza tokens con `type: 'refresh'` usados como access. `POST /api/auth/logout` exige `requireAuth` según `api_contracts.md`.
+
+**Decisión complementaria:** los access tokens incluyen `type: 'access'`; los refresh tokens incluyen `jti` aleatorio, se validan contra el hash persistido y rotan de forma atómica. Si se reutiliza un refresh ya revocado se revocan todas las sesiones activas del usuario. En producción, el arranque falla si faltan `JWT_ACCESS_SECRET` o `JWT_REFRESH_SECRET`; en desarrollo se conservan los valores de fallback.
+
+**Motivo:** Cumplir la petición de nombre de archivo, evitar confusión entre tipos de token, soportar rotación segura y detectar robo de sesión sin exponer errores internos como mensajes de autenticación.
+
+## AD-008 — Filtros públicos obligatorios (2026-11-25)
+
+**Decisión:** En `helpers/crud.js`, los filtros `publicFilter` y `publishedField` se aplican **al final** del armado del filtro, tanto en `list` como en `getById`. Ningún parámetro de query puede sobrescribir la visibilidad pública.
+
+**Motivo:** Cumplir F6 de `business_rules.md` y evitar que `?isActive=false` o un ID de borrador exponga contenido no publicado.
+
+**Consecuencia:** Los administradores siguen viendo borradores porque `optionalAuth` adjunta `req.user` cuando el token es válido.
+
+## AD-009 — Postman como referencia principal y Bruno como apoyo local (2026-11-25)
+
+**Decisión:** La documentación de API entregable es `context/api_contracts.md` más una colección Postman v2.1 en `docs/postman/`. Bruno se mantiene en `projects/backend/bruno/` únicamente para ejecución rápida en el entorno local y no se presenta como sustituto del entregable.
+
+**Motivo:** La rúbrica pide explícitamente "Documentación de API / Postman", mientras que Bruno aporta colecciones versionables y comodidad local sin comprometer la evidencia.
+
+## AD-010 — CI con Node 26 y cobertura como evidencia (2026-11-25)
+
+**Decisión:** `.github/workflows/backend-tests.yml` ejecuta `npm ci`, `npm test` y `npm run test:coverage` con `actions/setup-node` fijado en Node 26. Los reportes TAP y de cobertura se versionan en `docs/evidencias/`.
+
+**Motivo:** Hacer reproducible y pública la verificación del backend, y cerrar la brecha entre código probado y evidencia entregada.

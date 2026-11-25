@@ -9,4 +9,6 @@ const refreshTokenSchema = new Schema({
   revokedAt: { type: Date, default: null }
 }, { timestamps: true });
 
+refreshTokenSchema.index({ userId: 1, revokedAt: 1 });
+
 export default mongoose.model('RefreshToken', refreshTokenSchema);

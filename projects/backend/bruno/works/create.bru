@@ -1,0 +1,33 @@
+meta {
+  name: Crear obra publicada
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/works
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "title": "Obra Bruno",
+    "composer": "Anónimo",
+    "isPublished": true
+  }
+}
+
+tests {
+  test("HTTP 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

@@ -1,0 +1,673 @@
+{
+  "info": {
+    "_postman_id": "0c1f7d8e-5a2b-4c31-9a6f-coro-unefa-2026",
+    "name": "Coro Patrimonial UNEFA - API",
+    "description": "Colección principal de la API. Ejecutar en orden: Health, Auth, módulos y Cleanup. Login guarda accessToken en la variable de entorno.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:3500" },
+    { "key": "adminEmail", "value": "admin@coro.local" },
+    { "key": "adminPassword", "value": "CoroUnefa2026!" },
+    { "key": "accessToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "memberId", "value": "" },
+    { "key": "workId", "value": "" },
+    { "key": "draftId", "value": "" },
+    { "key": "eventId", "value": "" },
+    { "key": "monumentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 - Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Envelope ok', function () { var body = pm.response.json(); pm.expect(body.ok).to.be.true; pm.expect(body.data.status).to.eql('ok'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Auth",
+      "item": [
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 y token', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.data.accessToken).to.be.a('string');",
+                  "  pm.environment.set('accessToken', body.data.accessToken);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{adminEmail}}\",\"password\":\"{{adminPassword}}\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/auth/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 y usuario', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().data.email).to.eql(pm.environment.get('adminEmail') || 'admin@coro.local');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login inválido",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{adminEmail}}\",\"password\":\"incorrecta\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 UNAUTHORIZED', function () { pm.response.to.have.status(401); pm.expect(pm.response.json().error.code).to.eql('UNAUTHORIZED'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Users",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/users"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y paginación', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().data).to.have.property('items'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', function () { pm.response.to.have.status(201); pm.environment.set('userId', pm.response.json().data.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Usuario Postman\",\"email\":\"postman-{{$timestamp}}@coro.local\",\"password\":\"password123\",\"role\":\"viewer\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Desactivar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y disabled', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().data.disabled).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Members",
+      "item": [
+        {
+          "name": "Crear integrante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', function () { pm.response.to.have.status(201); pm.environment.set('memberId', pm.response.json().data._id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"Postman\",\"lastName\":\"Coro\",\"voiceType\":\"soprano\",\"role\":\"Corista\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/members"
+          }
+        },
+        {
+          "name": "Listar integrantes públicos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/members?search=Postman"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y solo activos', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().data.items.every(function (i) { return i.isActive === true; })).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dar de baja integrante",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"Postman\",\"lastName\":\"Coro\",\"isActive\":false}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/members/{{memberId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().data.isActive).to.be.false; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Baja no visible con query",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/members?search=Postman&isActive=false"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Integrante dado de baja no aparece', function () {",
+                  "  var id = pm.environment.get('memberId');",
+                  "  var items = pm.response.json().data.items;",
+                  "  pm.expect(items.some(function (i) { return i._id === id; })).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 - Works",
+      "item": [
+        {
+          "name": "Crear obra publicada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 y guardar workId', function () { pm.response.to.have.status(201); pm.environment.set('workId', pm.response.json().data._id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Ave María - Postman\",\"composer\":\"Gounod\",\"category\":\"sacred\",\"tags\":[\"liturgia\"],\"isPublished\":true}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/works"
+          }
+        },
+        {
+          "name": "Crear borrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Borrador Postman\",\"composer\":\"Anónimo\",\"isPublished\":false}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/works"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 y guardar draftId', function () { pm.response.to.have.status(201); pm.environment.set('draftId', pm.response.json().data._id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listado público solo publicados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/works?limit=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Solo publicados', function () { pm.expect(pm.response.json().data.items.every(function (w) { return w.isPublished === true; })).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Detalle de borrador es 404 para público",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/works/{{draftId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('404 NOT_FOUND', function () { pm.response.to.have.status(404); });"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 - Events",
+      "item": [
+        {
+          "name": "Crear evento publicado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 y guardar eventId', function () { pm.response.to.have.status(201); pm.environment.set('eventId', pm.response.json().data._id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Concierto Postman\",\"startAt\":\"2026-12-20T18:00:00.000Z\",\"venue\":{\"name\":\"Auditorio UNEFA\",\"city\":\"Caracas\"},\"type\":\"concert\",\"status\":\"published\",\"workIds\":[\"{{workId}}\"]}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/events"
+          }
+        },
+        {
+          "name": "Detalle público del evento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/events/{{eventId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y publicado', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().data.status).to.eql('published'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Evento sin fecha es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Sin fecha\",\"status\":\"published\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/events"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400 VALIDATION_ERROR', function () { pm.response.to.have.status(400); pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'); });"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 - Heritage",
+      "item": [
+        {
+          "name": "Crear pieza destacada",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Archivo Postman 1998\",\"type\":\"photo\",\"year\":1998,\"tags\":[\"historia\"],\"isPublished\":true,\"isFeatured\":true}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/heritage"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('201', function () { pm.response.to.have.status(201); });"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Filtrar destacados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/heritage?type=photo&tag=historia&year=1998&featured=true"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y resultados publicados', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  var items = pm.response.json().data.items;",
+                  "  pm.expect(items.every(function (i) { return i.isPublished === true && i.isFeatured === true; })).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 - Monuments",
+      "item": [
+        {
+          "name": "Crear monumento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 y guardar monumentId', function () { pm.response.to.have.status(201); pm.environment.set('monumentId', pm.response.json().data._id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Monumento Postman\",\"code\":\"MON-POSTMAN-{{$timestamp}}\",\"category\":\"Civil\",\"constructionType\":\"Mampostería\",\"location\":{\"lat\":10.5,\"lng\":-66.9,\"address\":\"Caracas\"}}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/monuments"
+          }
+        },
+        {
+          "name": "Categoría inválida es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Inválido\",\"code\":\"MON-INVALIDA\",\"category\":\"Desconocida\",\"constructionType\":\"Tapia\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/monuments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400', function () { pm.response.to.have.status(400); });"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Borrar monumento",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/monuments/{{monumentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 - Uploads",
+      "item": [
+        {
+          "name": "Subir imagen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 y URL', function () { pm.response.to.have.status(201); pm.expect(pm.response.json().data.url).to.match(/^\\/uploads\\/images\\//); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "folder", "value": "images", "type": "text" },
+                { "key": "file", "type": "file", "src": "docs/postman/fixtures/sample.png" }
+              ]
+            },
+            "url": "{{baseUrl}}/api/uploads"
+          }
+        },
+        {
+          "name": "Carpeta inválida es 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "folder", "value": "scripts", "type": "text" },
+                { "key": "file", "type": "file", "src": "docs/postman/fixtures/sample.png" }
+              ]
+            },
+            "url": "{{baseUrl}}/api/uploads"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400', function () { pm.response.to.have.status(400); });"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10 - Cleanup",
+      "item": [
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/auth/logout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

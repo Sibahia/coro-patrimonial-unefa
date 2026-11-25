@@ -1,0 +1,182 @@
+﻿
+> coro-patrimonial-unefa-backend@1.0.0 test:tap
+> node --test --test-reporter=tap
+
+TAP version 13
+# [db] MongoDB conectado
+# [server] Servidor ejecut├índose en el puerto 54040
+# Subtest: health y envelope de errores siguen el contrato
+ok 1 - health y envelope de errores siguen el contrato
+  ---
+  duration_ms: 4616.8799
+  type: 'test'
+  ...
+# Subtest: CORS solo acepta or├¡genes de la lista blanca
+ok 2 - CORS solo acepta or├¡genes de la lista blanca
+  ---
+  duration_ms: 7.5491
+  type: 'test'
+  ...
+# Subtest: JSON malformado devuelve 400 y no un error interno
+ok 3 - JSON malformado devuelve 400 y no un error interno
+  ---
+  duration_ms: 4.1554
+  type: 'test'
+  ...
+# Subtest: los roles restringen las rutas de administraci├│n y edici├│n
+ok 4 - los roles restringen las rutas de administraci├│n y edici├│n
+  ---
+  duration_ms: 96.0137
+  type: 'test'
+  ...
+# Subtest: users: alta, duplicado, edici├│n y baja l├│gica
+ok 5 - users: alta, duplicado, edici├│n y baja l├│gica
+  ---
+  duration_ms: 1155.3355
+  type: 'test'
+  ...
+# Subtest: members: validaci├│n, baja l├│gica y filtro p├║blico no eludible
+ok 6 - members: validaci├│n, baja l├│gica y filtro p├║blico no eludible
+  ---
+  duration_ms: 56.7133
+  type: 'test'
+  ...
+# Subtest: works: paginaci├│n, filtros y borrado l├│gico
+ok 7 - works: paginaci├│n, filtros y borrado l├│gico
+  ---
+  duration_ms: 68.1093
+  type: 'test'
+  ...
+# Subtest: events: ciclo draft ÔåÆ published ÔåÆ finished y visibilidad p├║blica
+ok 8 - events: ciclo draft ÔåÆ published ÔåÆ finished y visibilidad p├║blica
+  ---
+  duration_ms: 151.8285
+  type: 'test'
+  ...
+# Subtest: heritage: publicaci├│n, filtros y validaci├│n de tipo
+ok 9 - heritage: publicaci├│n, filtros y validaci├│n de tipo
+  ---
+  duration_ms: 26.5348
+  type: 'test'
+  ...
+# Subtest: monuments: validaciones y borrado l├│gico
+ok 10 - monuments: validaciones y borrado l├│gico
+  ---
+  duration_ms: 39.1855
+  type: 'test'
+  ...
+# Subtest: monuments: varias im├ígenes v├ílidas se conservan en orden
+ok 11 - monuments: varias im├ígenes v├ílidas se conservan en orden
+  ---
+  duration_ms: 37.2309
+  type: 'test'
+  ...
+# Subtest: uploads: subida v├ílida, entrega est├ítica y rechazos
+ok 12 - uploads: subida v├ílida, entrega est├ítica y rechazos
+  ---
+  duration_ms: 52.004
+  type: 'test'
+  ...
+# Subtest: socket: publicar contenido emite content:published
+ok 13 - socket: publicar contenido emite content:published
+  ---
+  duration_ms: 30.7363
+  type: 'test'
+  ...
+# [db] MongoDB conectado
+# [server] Servidor ejecut├índose en el puerto 54048
+# Subtest: registro exige rol admin y valida los datos
+ok 14 - registro exige rol admin y valida los datos
+  ---
+  duration_ms: 5491.1763
+  type: 'test'
+  ...
+# Subtest: login rechaza credenciales inv├ílidas y usuarios inactivos
+ok 15 - login rechaza credenciales inv├ílidas y usuarios inactivos
+  ---
+  duration_ms: 423.3344
+  type: 'test'
+  ...
+# Subtest: me valida el token y distingue errores de acceso
+ok 16 - me valida el token y distingue errores de acceso
+  ---
+  duration_ms: 22.5784
+  type: 'test'
+  ...
+# Subtest: ruta p├║blica con token inv├ílido contin├║a como an├│nima
+ok 17 - ruta p├║blica con token inv├ílido contin├║a como an├│nima
+  ---
+  duration_ms: 7.8984
+  type: 'test'
+  ...
+# Subtest: refresh rota tokens y revoca las sesiones si se reutiliza el anterior
+ok 18 - refresh rota tokens y revoca las sesiones si se reutiliza el anterior
+  ---
+  duration_ms: 251.8969
+  type: 'test'
+  ...
+# Subtest: logout exige autenticaci├│n y revoca la sesi├│n actual
+ok 19 - logout exige autenticaci├│n y revoca la sesi├│n actual
+  ---
+  duration_ms: 194.7539
+  type: 'test'
+  ...
+# [db] MongoDB conectado
+# [server] Servidor ejecut├índose en el puerto 54044
+# Subtest: health check responde
+ok 20 - health check responde
+  ---
+  duration_ms: 4347.2989
+  type: 'test'
+  ...
+# Subtest: crear Work sin token es rechazado
+ok 21 - crear Work sin token es rechazado
+  ---
+  duration_ms: 4.182
+  type: 'test'
+  ...
+# Subtest: validaci├│n de campos devuelve 400
+ok 22 - validaci├│n de campos devuelve 400
+  ---
+  duration_ms: 10.8853
+  type: 'test'
+  ...
+# Subtest: admin crea Works y el p├║blico solo ve publicados
+ok 23 - admin crea Works y el p├║blico solo ve publicados
+  ---
+  duration_ms: 66.9339
+  type: 'test'
+  ...
+# Subtest: ruta desconocida devuelve 404 en JSON
+ok 24 - ruta desconocida devuelve 404 en JSON
+  ---
+  duration_ms: 4.4462
+  type: 'test'
+  ...
+# Subtest: crear monumento con imagen v├ílida guarda el archivo y la URL
+ok 25 - crear monumento con imagen v├ílida guarda el archivo y la URL
+  ---
+  duration_ms: 52.1763
+  type: 'test'
+  ...
+# Subtest: crear monumento con extensi├│n inv├ílida devuelve 400
+ok 26 - crear monumento con extensi├│n inv├ílida devuelve 400
+  ---
+  duration_ms: 31.9977
+  type: 'test'
+  ...
+# Subtest: actualizar monumento a├▒ade im├ígenes sin reemplazar las existentes
+ok 27 - actualizar monumento a├▒ade im├ígenes sin reemplazar las existentes
+  ---
+  duration_ms: 129.8169
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8195.8946

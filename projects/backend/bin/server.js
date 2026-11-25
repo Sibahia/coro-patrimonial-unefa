@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 import { connectDatabase } from '../databases/mongodb.js';
+import { assertJwtConfig } from '../helpers/token.js';
 import { apiLimiter } from '../middlewares/rateLimit.js';
 import { notFound, errorHandler } from '../middlewares/errorHandler.js';
 import authRoutes from '../api/auth/routes.js';
@@ -36,6 +37,7 @@ class WebServer {
 
     this.app.set('io', this.io);
     this.app.set('trust proxy', 1);
+    assertJwtConfig();
 
     this.io.on('connection', (socket) => {
       console.log('[socket] cliente conectado:', socket.id);

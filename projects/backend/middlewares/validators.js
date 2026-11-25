@@ -16,13 +16,15 @@ export const idRule = [param('id').isMongoId().withMessage('ID inválido')];
 
 export const registerRules = [
   body('name').trim().notEmpty().withMessage('El nombre es obligatorio'),
-  body('email').trim().isEmail().withMessage('Email inválido'),
+  body('email').trim().isEmail().withMessage('Email inválido')
+    .customSanitizer((value) => String(value).trim().toLowerCase()),
   body('password').isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
   body('role').optional().isIn(['admin', 'editor', 'viewer']).withMessage('Rol inválido')
 ];
 
 export const loginRules = [
-  body('email').trim().isEmail().withMessage('Email inválido'),
+  body('email').trim().isEmail().withMessage('Email inválido')
+    .customSanitizer((value) => String(value).trim().toLowerCase()),
   body('password').notEmpty().withMessage('La contraseña es obligatoria')
 ];
 

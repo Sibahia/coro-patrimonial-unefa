@@ -1,0 +1,35 @@
+meta {
+  name: Crear evento
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/events
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "title": "Concierto Bruno",
+    "startAt": "2026-12-20T18:00:00.000Z",
+    "venue": { "name": "Auditorio UNEFA", "city": "Caracas" },
+    "status": "published"
+  }
+}
+
+tests {
+  test("HTTP 201", function() {
+    expect(res.getStatus()).to.equal(201);
+    bru.setEnvVar("eventId", res.getBody().data._id);
+  });
+}

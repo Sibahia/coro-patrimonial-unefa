@@ -1,0 +1,99 @@
+﻿
+> coro-patrimonial-unefa-backend@1.0.0 test:coverage
+> node --test --experimental-test-coverage
+
+[db] MongoDB conectado
+[server] Servidor ejecut├índose en el puerto 54084
+Ô£ö health y envelope de errores siguen el contrato (5120.8872ms)
+Ô£ö CORS solo acepta or├¡genes de la lista blanca (7.4561ms)
+Ô£ö JSON malformado devuelve 400 y no un error interno (4.5666ms)
+Ô£ö los roles restringen las rutas de administraci├│n y edici├│n (44.8512ms)
+Ô£ö users: alta, duplicado, edici├│n y baja l├│gica (1660.4503ms)
+Ô£ö members: validaci├│n, baja l├│gica y filtro p├║blico no eludible (59.5781ms)
+Ô£ö works: paginaci├│n, filtros y borrado l├│gico (61.775ms)
+Ô£ö events: ciclo draft ÔåÆ published ÔåÆ finished y visibilidad p├║blica (101.0015ms)
+Ô£ö heritage: publicaci├│n, filtros y validaci├│n de tipo (44.3394ms)
+Ô£ö monuments: validaciones y borrado l├│gico (47.1614ms)
+Ô£ö monuments: varias im├ígenes v├ílidas se conservan en orden (54.0165ms)
+Ô£ö uploads: subida v├ílida, entrega est├ítica y rechazos (50.9709ms)
+Ô£ö socket: publicar contenido emite content:published (37.4745ms)
+[db] MongoDB conectado
+[server] Servidor ejecut├índose en el puerto 54096
+Ô£ö registro exige rol admin y valida los datos (6470.0886ms)
+Ô£ö login rechaza credenciales inv├ílidas y usuarios inactivos (652.7297ms)
+Ô£ö me valida el token y distingue errores de acceso (20.6112ms)
+Ô£ö ruta p├║blica con token inv├ílido contin├║a como an├│nima (10.242ms)
+Ô£ö refresh rota tokens y revoca las sesiones si se reutiliza el anterior (240.4711ms)
+Ô£ö logout exige autenticaci├│n y revoca la sesi├│n actual (325.1614ms)
+[db] MongoDB conectado
+[server] Servidor ejecut├índose en el puerto 54088
+Ô£ö health check responde (4718.5941ms)
+Ô£ö crear Work sin token es rechazado (8.9234ms)
+Ô£ö validaci├│n de campos devuelve 400 (25.5842ms)
+Ô£ö admin crea Works y el p├║blico solo ve publicados (248.313ms)
+Ô£ö ruta desconocida devuelve 404 en JSON (5.682ms)
+Ô£ö crear monumento con imagen v├ílida guarda el archivo y la URL (204.3403ms)
+Ô£ö crear monumento con extensi├│n inv├ílida devuelve 400 (10.4198ms)
+Ô£ö actualizar monumento a├▒ade im├ígenes sin reemplazar las existentes (231.3756ms)
+Ôä╣ tests 27
+Ôä╣ suites 0
+Ôä╣ pass 27
+Ôä╣ fail 0
+Ôä╣ cancelled 0
+Ôä╣ skipped 0
+Ôä╣ todo 0
+Ôä╣ duration_ms 9793.9475
+Ôä╣ start of coverage report
+Ôä╣ -------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ file                     | line % | branch % | funcs % | uncovered lines
+Ôä╣ -------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ api                      |        |          |         | 
+Ôä╣  auth                    |        |          |         | 
+Ôä╣   controller.js          |  83.52 |    66.67 |  100.00 | 57-63 94-95 101-102 105-106 111-112 121-124 128-131 140-143 173-174
+Ôä╣   model.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣   routes.js              | 100.00 |   100.00 |  100.00 | 
+Ôä╣  events                  |        |          |         | 
+Ôä╣   controller.js          | 100.00 |   100.00 |  100.00 | 
+Ôä╣   model.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣   routes.js              | 100.00 |   100.00 |  100.00 | 
+Ôä╣  heritage                |        |          |         | 
+Ôä╣   controller.js          | 100.00 |   100.00 |  100.00 | 
+Ôä╣   model.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣   routes.js              | 100.00 |   100.00 |  100.00 | 
+Ôä╣  members                 |        |          |         | 
+Ôä╣   controller.js          | 100.00 |   100.00 |  100.00 | 
+Ôä╣   model.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣   routes.js              | 100.00 |   100.00 |  100.00 | 
+Ôä╣  monuments               |        |          |         | 
+Ôä╣   monument.controller.js |  75.23 |    67.44 |   75.00 | 61-62 66-67 84-87 103-105 119-122 125-154 159 177-179 202-204 207-209
+Ôä╣   monument.model.js      | 100.00 |   100.00 |  100.00 | 
+Ôä╣   monument.routes.js     | 100.00 |   100.00 |  100.00 | 
+Ôä╣  uploads                 |        |          |         | 
+Ôä╣   controller.js          |  96.49 |    76.92 |  100.00 | 43-44
+Ôä╣   model.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣   routes.js              | 100.00 |   100.00 |  100.00 | 
+Ôä╣  users                   |        |          |         | 
+Ôä╣   controller.js          |  89.29 |    64.29 |   83.33 | 17-19 40-43 64-65
+Ôä╣   model.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣   routes.js              | 100.00 |   100.00 |  100.00 | 
+Ôä╣  works                   |        |          |         | 
+Ôä╣   controller.js          | 100.00 |   100.00 |  100.00 | 
+Ôä╣   model.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣   routes.js              | 100.00 |   100.00 |  100.00 | 
+Ôä╣ bin                      |        |          |         | 
+Ôä╣  server.js               |  97.12 |    88.24 |   84.62 | 43 114-116
+Ôä╣ databases                |        |          |         | 
+Ôä╣  mongodb.js              |  76.47 |    66.67 |   50.00 | 6-7 16-17
+Ôä╣ helpers                  |        |          |         | 
+Ôä╣  crud.js                 | 100.00 |    87.23 |  100.00 | 
+Ôä╣  response.js             | 100.00 |   100.00 |  100.00 | 
+Ôä╣  token.js                |  93.85 |    84.62 |  100.00 | 7-10
+Ôä╣ middlewares              |        |          |         | 
+Ôä╣  auth.middleware.js      |  91.75 |    84.62 |  100.00 | 51-52 55-56 80-81 90-91
+Ôä╣  errorHandler.js         |  62.79 |    64.29 |  100.00 | 16-17 25-28 30-39
+Ôä╣  rateLimit.js            | 100.00 |   100.00 |  100.00 | 
+Ôä╣  validators.js           | 100.00 |    87.50 |  100.00 | 
+Ôä╣ -------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ all files                |  91.17 |    79.20 |   90.80 | 
+Ôä╣ -------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ end of coverage report
