@@ -41,3 +41,47 @@ Historial de decisiones de diseño del proyecto Coro Patrimonial UNEFA.
 **Motivo:** Mantener el historial fotográfico del monumento y evitar colisiones de nombres y archivos huérfanos.
 
 **Consecuencia:** El campo `images` de `req.body` queda reservado para URLs existentes en `POST`; en `PUT` se ignora cuando hay archivos subidos.
+
+## AD-007 — Middleware de autenticación y endurecimiento JWT (2026-11-24)
+
+**Decisión:** El middleware se llama `projects/backend/middlewares/auth.middleware.js` (se renombró desde `auth.js` y se actualizaron los 8 imports). Exporta `requireAuth`, `optionalAuth` y `requireRole`. El parseo de `Authorization` acepta solo `Bearer <token>` (insensible a mayúsculas, sin tokens vacíos), distingue 401 por JWT de 500 por error de base de datos y rechaza tokens con `type: 'refresh'` usados como access. `POST /api/auth/logout` exige `requireAuth` según `api_contracts.md`.
+
+**Decisión complementaria:** los access tokens incluyen `type: 'access'`; los refresh tokens incluyen `jti` aleatorio, se validan contra el hash persistido y rotan de forma atómica. Si se reutiliza un refresh ya revocado se revocan todas las sesiones activas del usuario. En producción, el arranque falla si faltan `JWT_ACCESS_SECRET` o `JWT_REFRESH_SECRET`; en desarrollo se conservan los valores de fallback.
+
+**Motivo:** Cumplir la petición de nombre de archivo, evitar confusión entre tipos de token, soportar rotación segura y detectar robo de sesión sin exponer errores internos como mensajes de autenticación.
+
+## AD-008 — Filtros públicos obligatorios (2026-11-25)
+
+**Decisión:** En `helpers/crud.js`, los filtros `publicFilter` y `publishedField` se aplican **al final** del armado del filtro, tanto en `list` como en `getById`. Ningún parámetro de query puede sobrescribir la visibilidad pública.
+
+**Motivo:** Cumplir F6 de `business_rules.md` y evitar que `?isActive=false` o un ID de borrador exponga contenido no publicado.
+
+**Consecuencia:** Los administradores siguen viendo borradores porque `optionalAuth` adjunta `req.user` cuando el token es válido.
+
+## AD-009 — Postman como referencia principal y Bruno como apoyo local (2026-11-25)
+
+**Decisión:** La documentación de API entregable es `context/api_contracts.md` más una colección Postman v2.1 en `docs/postman/`. Bruno se mantiene en `projects/backend/bruno/` únicamente para ejecución rápida en el entorno local y no se presenta como sustituto del entregable.
+
+**Motivo:** La rúbrica pide explícitamente "Documentación de API / Postman", mientras que Bruno aporta colecciones versionables y comodidad local sin comprometer la evidencia.
+
+## AD-010 — CI con Node 26 y cobertura como evidencia (2026-11-25)
+
+**Decisión:** `.github/workflows/backend-tests.yml` ejecuta `npm ci`, `npm test` y `npm run test:coverage` con `actions/setup-node` fijado en Node 26. Los reportes TAP y de cobertura se versionan en `docs/evidencias/`.
+
+**Motivo:** Hacer reproducible y pública la verificación del backend, y cerrar la brecha entre código probado y evidencia entregada.
+
+## AD-011 — Render como plataforma de despliegue (2026-11-25)
+
+**Decisión:** El backend se despliega en Render mediante el Blueprint `render.yaml` (web service Node 26, `rootDir: projects/backend`, `buildCommand: npm ci`, `startCommand: npm start`, `healthCheckPath: /api/health` y `initialDeployHook: npm run seed`). MongoDB se apunta a Atlas con `MONGO_URI` y los secretos JWT se generan en Render. El plan inicial es gratuito, con el directorio `/uploads` efímero; la persistencia con disco de pago queda documentada como mejora posterior.
+
+**Motivo:** El usuario eligió Render entre las alternativas planteadas; el Blueprint deja el despliegue reproducible y auditable desde el repositorio.
+
+**Consecuencia:** El servicio se creó posteriormente mediante la API pública de Render y quedó en estado `live` en <https://coro-patrimonial-unefa-api.onrender.com>. `docs/despliegue_render.md` detalla el proceso y el cierre del entregable 7.
+
+## AD-012 — Despliegue por API de Render y Atlas M0 (2026-11-25)
+
+**Decisión:** Crear el web service con `POST /v1/services` de la API pública de Render (la API no expone creación de Blueprints) sobre la rama `feat/backend-test-evidence`, con `rootDir=projects/backend`, plan `free`, región `oregon` y healthcheck `/api/health`. La base de datos es un cluster MongoDB Atlas M0 en AWS Oregon. Los secretos JWT se generan en Render; `MONGO_URI` y `SEED_PASSWORD` se inyectan como variables de entorno y nunca se versionan.
+
+**Motivo:** El usuario eligió Render y la opción gratuita de Atlas; un private service con MongoDB en Render implicaría un cargo mensual, y un Mongo local con túnel sería frágil.
+
+**Consecuencia:** `initialDeployHook` no existe en `servicePOST` y los *one-off jobs* de Render requieren plan de pago, así que el seed se ejecuta localmente con Node 26 contra la misma URI de Atlas (script idempotente). `render.yaml` se conserva como referencia para recrear el servicio desde el dashboard.

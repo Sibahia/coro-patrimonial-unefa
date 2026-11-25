@@ -1,0 +1,22 @@
+meta {
+  name: Listar usuarios (admin)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/users
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+tests {
+  test("HTTP 200 y paginación", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data).to.have.property("items");
+  });
+}

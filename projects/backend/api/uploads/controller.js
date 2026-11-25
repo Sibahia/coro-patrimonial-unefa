@@ -38,7 +38,10 @@ export async function upload(req, res) {
 
   await fs.mkdir(path.dirname(destination), { recursive: true });
   if (file.tempFilePath) {
-    await fs.rename(file.tempFilePath, destination);
+    // `rename` falla con EXDEV cuando /tmp y el proyecto están en dispositivos
+    // distintos (caso de Render). Copiar + borrar funciona en ambos entornos.
+    await fs.copyFile(file.tempFilePath, destination);
+    await fs.unlink(file.tempFilePath).catch(() => {});
   } else {
     await file.mv(destination);
   }

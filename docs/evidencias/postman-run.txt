@@ -1,0 +1,147 @@
+﻿newman
+
+Coro Patrimonial UNEFA - API
+
+□ 01 - Health
+└ Health check
+  GET http://127.0.0.1:3500/api/health [200 OK, 822B, 34ms]
+  √  HTTP 200
+  √  Envelope ok
+
+□ 02 - Auth
+└ Login admin
+  POST http://127.0.0.1:3500/api/auth/login [200 OK, 1.51kB, 115ms]
+  √  HTTP 200 y token
+
+└ Me
+  GET http://127.0.0.1:3500/api/auth/me [200 OK, 862B, 5ms]
+  √  HTTP 200 y usuario
+
+└ Login inválido
+  POST http://127.0.0.1:3500/api/auth/login [401 Unauthorized, 834B, 97ms]
+  √  401 UNAUTHORIZED
+
+□ 03 - Users
+└ Listar usuarios
+  GET http://127.0.0.1:3500/api/users [200 OK, 1.94kB, 6ms]
+  √  200 y paginación
+
+└ Crear usuario
+  POST http://127.0.0.1:3500/api/users [201 Created, 922B, 407ms]
+  √  201
+
+└ Desactivar usuario
+  DELETE http://127.0.0.1:3500/api/users/6b0709a0272676b34aa94dd5 [200 OK, 796B, 6ms]
+  √  200 y disabled
+
+□ 04 - Members
+└ Crear integrante
+  POST http://127.0.0.1:3500/api/members [201 Created, 1.08kB, 5ms]
+  √  201
+
+└ Listar integrantes públicos
+  GET http://127.0.0.1:3500/api/members?search=Postman [200 OK, 1.12kB, 6ms]
+  √  200 y solo activos
+
+└ Dar de baja integrante
+  PUT http://127.0.0.1:3500/api/members/6b0709a0272676b34aa94dda [200 OK, 1.07kB, 7ms]
+  √  200
+
+└ Baja no visible con query
+  GET http://127.0.0.1:3500/api/members?search=Postman&isActive=false [200 OK, 799B, 5ms]
+  √  Integrante dado de baja no aparece
+
+□ 05 - Works
+└ Crear obra publicada
+  POST http://127.0.0.1:3500/api/works [201 Created, 1.04kB, 6ms]
+  √  201 y guardar workId
+
+└ Crear borrador
+  POST http://127.0.0.1:3500/api/works [201 Created, 1.03kB, 6ms]
+  √  201 y guardar draftId
+
+└ Listado público solo publicados
+  GET http://127.0.0.1:3500/api/works?limit=20 [200 OK, 2.78kB, 6ms]
+  √  Solo publicados
+
+└ Detalle de borrador es 404 para público
+  GET http://127.0.0.1:3500/api/works/6b0709a1272676b34aa94de6 [404 Not Found, 810B, 3ms]
+  √  404 NOT_FOUND
+
+□ 06 - Events
+└ Crear evento publicado
+  POST http://127.0.0.1:3500/api/events [201 Created, 1.11kB, 7ms]
+  √  201 y guardar eventId
+
+└ Detalle público del evento
+  GET http://127.0.0.1:3500/api/events/6b0709a1272676b34aa94dec [200 OK, 1.37kB, 7ms]
+  √  200 y publicado
+
+└ Evento sin fecha es 400
+  POST http://127.0.0.1:3500/api/events [400 Bad Request, 894B, 5ms]
+  √  400 VALIDATION_ERROR
+
+□ 07 - Heritage
+└ Crear pieza destacada
+  POST http://127.0.0.1:3500/api/heritage [201 Created, 1.05kB, 5ms]
+  √  201
+
+└ Filtrar destacados
+  GET http://127.0.0.1:3500/api/heritage?type=photo&tag=historia&year=1998&featured=true [200 OK, 2.84kB, 6ms]
+  √  200 y resultados publicados
+
+□ 08 - Monuments
+└ Crear monumento
+  POST http://127.0.0.1:3500/api/monuments [201 Created, 1.13kB, 5ms]
+  √  201 y guardar monumentId
+
+└ Categoría inválida es 400
+  POST http://127.0.0.1:3500/api/monuments [400 Bad Request, 890B, 4ms]
+  √  400
+
+└ Borrar monumento
+  DELETE http://127.0.0.1:3500/api/monuments/6b0709a2272676b34aa94df7 [200 OK, 795B, 5ms]
+  √  200
+
+□ 09 - Uploads
+└ Subir imagen
+node.exe : (node:1980) [DEP0044] DeprecationWarning: The `util.isArray` API is deprecated. Please use 
+`Array.isArray()` instead.
+En C:\Users\danie\AppData\Roaming\fnm\node-versions\v26.13.1\installation\newman.ps1: 16 Carácter: 5
++     & "$basedir/node$exe"  "$basedir/node_modules/newman/bin/newman.j ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:1980) [DE...ray()` instead.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-deprecation ...` to show where the warning was created)
+  POST http://127.0.0.1:3500/api/uploads [201 Created, 1.05kB, 15ms]
+  √  201 y URL
+
+└ Carpeta inválida es 400
+  POST http://127.0.0.1:3500/api/uploads [400 Bad Request, 827B, 7ms]
+  √  400
+
+□ 10 - Cleanup
+└ Logout
+  POST http://127.0.0.1:3500/api/auth/logout [200 OK, 874B, 6ms]
+  √  200
+
+┌─────────────────────────┬───────────────────┬──────────────────┐
+│                         │          executed │           failed │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              iterations │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│                requests │                26 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│            test-scripts │                26 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│      prerequest-scripts │                 0 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              assertions │                27 │                0 │
+├─────────────────────────┴───────────────────┴──────────────────┤
+│ total run duration: 3s                                         │
+├────────────────────────────────────────────────────────────────┤
+│ total data received: 10.71kB (approx)                          │
+├────────────────────────────────────────────────────────────────┤
+│ average response time: 30ms [min: 3ms, max: 407ms, s.d.: 80ms] │
+└────────────────────────────────────────────────────────────────┘

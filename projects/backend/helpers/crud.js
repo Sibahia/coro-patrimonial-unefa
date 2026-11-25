@@ -47,9 +47,6 @@ export function createCrudController(Model, options = {}) {
     list: async (req, res) => {
       const filter = baseFilter();
 
-      if (publicFilter && !req.user) Object.assign(filter, publicFilter);
-      if (publishedField && !req.user) filter[publishedField] = publishedValue;
-
       if (req.query.search && searchFields.length) {
         const rx = new RegExp(escapeRegex(req.query.search), 'i');
         filter.$or = searchFields.map((field) => ({ [field]: rx }));
@@ -60,6 +57,11 @@ export function createCrudController(Model, options = {}) {
       if (tagFilter && req.query.tag) filter.tags = req.query.tag;
       if (yearFilter && req.query.year) filter.year = Number(req.query.year);
       if (featuredFilter && req.query.featured === 'true') filter.isFeatured = true;
+
+      // Los filtros públicos se aplican al final para que un query param no pueda
+      // revelar contenido no publicado o integrantes dados de baja.
+      if (publicFilter && !req.user) Object.assign(filter, publicFilter);
+      if (publishedField && !req.user) filter[publishedField] = publishedValue;
 
       const page = Math.max(1, parseInt(req.query.page, 10) || 1);
       const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
@@ -74,7 +76,11 @@ export function createCrudController(Model, options = {}) {
     },
 
     getById: async (req, res) => {
-      const doc = await Model.findOne({ _id: req.params.id, deletedAt: null }).populate(populate);
+      const filter = { _id: req.params.id, deletedAt: null };
+      if (publicFilter && !req.user) Object.assign(filter, publicFilter);
+      if (publishedField && !req.user) filter[publishedField] = publishedValue;
+
+      const doc = await Model.findOne(filter).populate(populate);
       if (!doc) return fail(res, 404, 'NOT_FOUND', 'Recurso no encontrado');
       return ok(res, doc);
     },

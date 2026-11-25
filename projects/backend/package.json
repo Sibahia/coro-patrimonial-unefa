@@ -9,9 +9,12 @@
   },
   "scripts": {
     "dev": "node --watch index.js",
+    "dev:memory": "node scripts/local-api-server.js",
     "start": "node index.js",
     "seed": "node scripts/seeders/seed.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:tap": "node --test --test-reporter=tap",
+    "test:coverage": "node --test --experimental-test-coverage"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

@@ -1,0 +1,18 @@
+meta {
+  name: Listado público
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/works
+  body: none
+  auth: none
+}
+
+tests {
+  test("Solo publicados", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.items.every(function(item) { return item.isPublished === true; })).to.equal(true);
+  });
+}
