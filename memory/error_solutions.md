@@ -121,3 +121,13 @@ Registro de errores, soluciones y parches aplicados.
 **Solución:** Ejecutar el seed localmente con Node 26 apuntando a la misma URI de Atlas en lugar de usar un job de Render.
 
 **Verificación:** Usuarios semilla creados y login administrativo correcto contra `https://coro-patrimonial-unefa-api.onrender.com/api/auth/login`.
+
+## ES-013 — Contraseña semilla versionada en los entornos `Deployed` (2026-11-25)
+
+**Síntoma:** La contraseña del usuario semilla quedó guardada en `docs/postman/Deployed.postman_environment.json` y `projects/backend/bruno/environments/Deployed.bru`, incumpliendo la regla de no commitear secretos.
+
+**Causa:** Los entornos se rellenaron con el valor real para poder ejecutar Newman contra el despliegue.
+
+**Solución:** Rotar la contraseña (nuevo hash en los tres usuarios y variable `SEED_PASSWORD` actualizada en Render), dejar `adminPassword` vacío en los archivos versionados y pasar el valor con `--env-var` en la ejecución de Newman.
+
+**Verificación:** Newman vuelve a pasar 26 requests y 27 assertions sin fallos usando la credencial rotada; ningún secreto queda en los entornos versionados.
