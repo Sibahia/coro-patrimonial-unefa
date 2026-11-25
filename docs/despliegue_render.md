@@ -97,16 +97,17 @@ Si el primer request da `503`, esperar a que Render despierte el servicio y repe
 
 ## 5. Postman contra el despliegue
 
-Los entornos `Deployed` ya están configurados con la URL pública y la contraseña del usuario semilla:
+Los entornos `Deployed` ya están configurados con la URL pública:
 
 - `docs/postman/Deployed.postman_environment.json`
 - `projects/backend/bruno/environments/Deployed.bru`
 
-Ejecución desde la raíz del repositorio:
+Por seguridad, `adminPassword` se deja vacío en el repositorio y se pasa en tiempo de ejecución:
 
 ```bash
 newman run docs/postman/coro-patrimonial-unefa.postman_collection.json \
-  -e docs/postman/Deployed.postman_environment.json -r cli
+  -e docs/postman/Deployed.postman_environment.json \
+  --env-var "adminPassword=$SEED_PASSWORD" -r cli
 ```
 
 Resultado guardado en `docs/evidencias/postman-deployed-run.txt`: **26 requests · 27 assertions · 0 fallos**.
