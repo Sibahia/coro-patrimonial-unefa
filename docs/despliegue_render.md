@@ -4,7 +4,19 @@
 
 ## 1. Estado actual
 
-El Blueprint está versionado y listo, pero **no se ha ejecutado el despliegue** porque en este entorno no hay credenciales de Render (`RENDER_API_KEY`) ni una URI de MongoDB Atlas. La URL pública del entregable 7 se completa siguiendo los pasos de este documento.
+**Backend desplegado y verificado:** <https://coro-patrimonial-unefa-api.onrender.com>
+
+| Dato | Valor |
+|---|---|
+| Servicio Render | `srv-dc3hiuk0916s738qi1tg` |
+| Dashboard | <https://dashboard.render.com/web/srv-dc3hiuk0916s738qi1tg> |
+| Rama desplegada | `feat/backend-test-evidence` (PR #4 abierto; tras el merge se pasa a `main`) |
+| Deploy verificado | `dep-dc3hnqlg1s2s73eo3rug` · commit `cbe2b4c` · estado `live` |
+| Base de datos | MongoDB Atlas M0, cluster `coro-patrimonial-unefa` (AWS Oregon) |
+| Healthcheck | `GET /api/health` → `200`, `{ "ok": true }` |
+| Evidencia | `docs/evidencias/postman-deployed-run.txt` (26 requests, 27 assertions, 0 fallos) |
+
+El servicio se creó con la API pública de Render (`POST /v1/services`) porque la API no expone creación de Blueprints. `render.yaml` se mantiene versionado como referencia para recrear el servicio desde el dashboard.
 
 ## 2. Requisitos
 
@@ -17,23 +29,39 @@ El Blueprint está versionado y listo, pero **no se ha ejecutado el despliegue**
 
 > Render no ofrece MongoDB administrado, por eso `MONGO_URI` se solicita al crear el Blueprint y apunta a MongoDB Atlas. Añade la IP saliente de Render o permite acceso desde cualquier IP (`0.0.0.0/0`) en Atlas si el cluster gratuito lo requiere.
 
-## 3. Crear el servicio desde el Blueprint
+## 3. Creación del servicio
 
-1. En Render: **New → Blueprint**.
-2. Conectar la cuenta de GitHub y seleccionar `Sibahia/coro-patrimonial-unefa`.
-3. Elegir la rama que contiene `render.yaml` (`feat/backend-test-evidence` mientras el PR esté abierto; después, `main`).
-4. Render detecta el Blueprint y pide los valores `sync: false`:
+### Vía utilisada: API pública de Render
 
-| Variable | Valor sugerido |
+```http
+POST https://api.render.com/v1/services
+Authorization: Bearer <RENDER_API_KEY>
+```
+
+Cuerpo relevante: `type=web_service`, `ownerId=<workspace>`, `repo=https://github.com/Sibahia/coro-patrimonial-unefa`, `branch=feat/backend-test-evidence`, `rootDir=projects/backend`, `runtime=node`, `plan=free`, `region=oregon`, `healthCheckPath=/api/health`, `buildCommand=npm ci`, `startCommand=npm start`.
+
+Variables inyectadas como `envVars` (los secretos JWT con `generateValue: true`):
+
+| Variable | Valor |
 |---|---|
-| `MONGO_URI` | `mongodb+srv://<usuario>:<password>@<cluster>.mongodb.net/coro_patrimonial_unefa` |
-| `CORS_ORIGINS` | `https://<frontend>.onrender.com,http://localhost:4200` (el dominio real del SPA cuando exista) |
-| `SEED_PASSWORD` | Contraseña larga para los usuarios semilla; **no usar la del ejemplo en producción** |
+| `NODE_VERSION` | `26` |
+| `NODE_ENV` | `production` |
+| `MONGO_URI` | URI `mongodb+srv://…` de Atlas con base `coro_patrimonial_unefa` |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Generados por Render |
+| `CORS_ORIGINS` | `http://localhost:4200,https://coro-patrimonial-unefa-api.onrender.com` |
+| `SEED_PASSWORD` | Contraseña fuerte del usuario semilla |
+| `COOKIE_SECURE` | `true` |
+| `UPLOAD_MAX_SIZE_MB` | `10` |
 
-5. Las variables `JWT_ACCESS_SECRET` y `JWT_REFRESH_SECRET` se generan automáticamente (`generateValue: true`); no hay que pegarlas a mano.
-6. **Apply**. El build ejecuta `npm ci`, el arranque `npm start` y, tras el primer despliegue correcto, `initialDeployHook` corre `npm run seed`.
+> La API pública no ofrece creación de Blueprints, pero `render.yaml` sigue siendo la referencia versionada para recrear el servicio desde **New → Blueprint** en el dashboard.
 
-### Qué hace el Blueprint
+### Alternativa desde el Blueprint
+
+1. En Render: **New → Blueprint** → conectar GitHub → seleccionar `Sibahia/coro-patrimonial-unefa`.
+2. Elegir la rama que contiene `render.yaml` (`feat/backend-test-evidence` mientras el PR esté abierto; después, `main`).
+3. Completar los valores `sync: false` (`MONGO_URI`, `CORS_ORIGINS`, `SEED_PASSWORD`) y aplicar.
+
+### Configuración efectiva
 
 | Campo | Valor | Motivo |
 |---|---|---|
@@ -41,37 +69,47 @@ El Blueprint está versionado y listo, pero **no se ha ejecutado el despliegue**
 | `buildCommand` | `npm ci` | Instalación reproducible desde `package-lock.json`. |
 | `startCommand` | `npm start` | `node index.js`; respeta el `PORT` que inyecta Render. |
 | `healthCheckPath` | `/api/health` | Render marca el despliegue como live solo si responde 200. |
-| `initialDeployHook` | `npm run seed` | Crea `admin@coro.local`, `editor@coro.local` y `viewer@coro.local` para poder ejecutar Postman. |
 | `plan` | `free` | Sin costo. Se suspende tras inactividad; el primer smoke test puede tardar ~30-60 s. |
+
+### Seed de usuarios
+
+`initialDeployHook` existe en el Blueprint, pero **no está disponible en `servicePOST` de la API**; los *one-off jobs* (`POST /services/{id}/jobs`) requieren plan de pago. Por eso el seed se ejecutó con Node 26 contra la misma URI de Atlas:
+
+```bash
+MONGO_URI='mongodb+srv://…' SEED_PASSWORD='…' npm --prefix projects/backend run seed
+```
+
+El script es idempotente y crea `admin@coro.local`, `editor@coro.local` y `viewer@coro.local`.
 
 ## 4. Verificación
 
 ```bash
-curl https://<SERVICIO>.onrender.com/api/health
+curl https://coro-patrimonial-unefa-api.onrender.com/api/health
 ```
 
-Respuesta esperada:
+Respuesta obtenida:
 
 ```json
-{ "ok": true, "data": { "status": "ok", "uptime": 12.3, "timestamp": "..." } }
+{ "ok": true, "data": { "status": "ok", "uptime": 241.8, "timestamp": "2026-11-25T17:27:37.321Z" } }
 ```
 
 Si el primer request da `503`, esperar a que Render despierte el servicio y repetir.
 
-## 5. Ejecutar Postman contra el despliegue
+## 5. Postman contra el despliegue
 
-1. Abrir `docs/postman/Deployed.postman_environment.json`.
-2. Reemplazar `https://REEMPLAZAR-POR-URL-DEL-BACKEND` por `https://<SERVICIO>.onrender.com`.
-3. Ajustar `adminPassword` al valor de `SEED_PASSWORD` usado en el paso 3.
-4. Ejecutar desde la raíz del repositorio:
+Los entornos `Deployed` ya están configurados con la URL pública y la contraseña del usuario semilla:
+
+- `docs/postman/Deployed.postman_environment.json`
+- `projects/backend/bruno/environments/Deployed.bru`
+
+Ejecución desde la raíz del repositorio:
 
 ```bash
 newman run docs/postman/coro-patrimonial-unefa.postman_collection.json \
   -e docs/postman/Deployed.postman_environment.json -r cli
 ```
 
-5. Guardar la salida en `docs/evidencias/postman-deployed-run.txt`.
-6. Repetir el reemplazo en `projects/backend/bruno/environments/Deployed.bru` si se quiere la misma verificación con Bruno.
+Resultado guardado en `docs/evidencias/postman-deployed-run.txt`: **26 requests · 27 assertions · 0 fallos**.
 
 ## 6. Persistencia de archivos (opcional)
 
@@ -99,9 +137,9 @@ En Render, cada push a la rama vinculada dispara un despliegue; para una actuali
 
 ## 8. Cierre del entregable 7
 
-Una vez verificada la URL:
-
-- Reemplazar el placeholder en `docs/postman/Deployed.postman_environment.json` y `projects/backend/bruno/environments/Deployed.bru`.
-- Añadir la salida de Newman a `docs/evidencias/`.
-- Actualizar la fila 7 de [`docs/evidencias/matriz_entregables.md`](evidencias/matriz_entregables.md) con la URL y marcar ✅.
-- El PR #4 se actualizará con un commit adicional; no hace falta abrir otro PR.
+- [x] Servicio Render creado y en estado `live`.
+- [x] Health público verificado.
+- [x] Seed ejecutado contra Atlas.
+- [x] Entornos `Deployed` de Postman y Bruno actualizados.
+- [x] Newman ejecutado contra la URL pública y evidencia guardada.
+- [x] Fila 7 de [`docs/evidencias/matriz_entregables.md`](evidencias/matriz_entregables.md) marcada ✅ (10/10).

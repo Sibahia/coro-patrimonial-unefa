@@ -91,3 +91,33 @@ Registro de errores, soluciones y parches aplicados.
 **Solución:** migrar siete peticiones a `auth:bearer { token: {{accessToken}} }`. Además, dentro de los scripts `tests {}` las variables `{{...}}` no se interpolan: se usa `bru.getEnvVar("adminEmail")` en lugar de `"{{adminEmail}}"`. Bruno CLI debe ejecutarse desde la raíz de la colección (`projects/backend/bruno`).
 
 **Verificación:** `bru run --env Local -r` → 10/10 requests y 10/10 pruebas; salida en `docs/evidencias/bruno-local-run.txt`.
+
+## ES-010 — Seed rechazado por `language_override: 'la'` en Atlas (2026-11-25)
+
+**Síntoma:** `npm run seed` contra Atlas fallaba con `language override unsupported: la` al crear las obras de ejemplo.
+
+**Causa:** El esquema `Work` tiene un campo `language` con códigos como `la` (latín). Mongoose detecta automáticamente ese campo como `language_override` del índice de texto y MongoDB no admite `la` como idioma de texto. El índice ya creado tenía `language_override: 'language'`.
+
+**Solución:** Declarar el índice con `language_override: 'textLanguage'` (campo inexistente, por lo que se usa el idioma por defecto), eliminar el índice anterior en Atlas y reejecutar el seed.
+
+**Verificación:** El índice quedó con `language_override: 'textLanguage'`; el seed termina con `[seed] contenido de ejemplo listo` y Newman pasa el listado/creación de Works contra el despliegue.
+
+## ES-011 — Upload con 500 en Render por EXDEV (2026-11-25)
+
+**Síntoma:** `POST /api/uploads` respondía `500 SERVER_ERROR` en Render, aunque pasaba en local.
+
+**Causa:** Los logs de Render mostraban `EXDEV: cross-device link not permitted`: `express-fileupload` escribe el temporal en `/tmp` y el código hacía `fs.rename()` hacia `/opt/render/project/src/...`, que están en dispositivos distintos.
+
+**Solución:** Reemplazar `rename` por `fs.copyFile()` + `fs.unlink()` del temporal en `api/uploads/controller.js` (el controlador de monumentos ya tenía fallback para EXDEV).
+
+**Verificación:** Tras el redeploy del commit `cbe2b4c`, Newman contra `Deployed` devuelve `201 Created` en la subida de imagen: 26 requests y 27 assertions sin fallos.
+
+## ES-012 — One-off jobs de Render exigen plan de pago (2026-11-25)
+
+**Síntoma:** `POST /v1/services/{id}/jobs` respondía `400 {"message":"new paid services not allowed: srv-..."}`.
+
+**Causa:** Los trabajos de un solo uso de Render no están disponibles en el plan free.
+
+**Solución:** Ejecutar el seed localmente con Node 26 apuntando a la misma URI de Atlas en lugar de usar un job de Render.
+
+**Verificación:** Usuarios semilla creados y login administrativo correcto contra `https://coro-patrimonial-unefa-api.onrender.com/api/auth/login`.

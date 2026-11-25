@@ -76,4 +76,12 @@ Historial de decisiones de diseño del proyecto Coro Patrimonial UNEFA.
 
 **Motivo:** El usuario eligió Render entre las alternativas planteadas; el Blueprint deja el despliegue reproducible y auditable desde el repositorio.
 
-**Consecuencia:** No se ejecutó el despliegue porque el entorno no tiene `RENDER_API_KEY` ni URI de Atlas. `docs/despliegue_render.md` detalla los pasos para crearlo y cerrar el entregable 7.
+**Consecuencia:** El servicio se creó posteriormente mediante la API pública de Render y quedó en estado `live` en <https://coro-patrimonial-unefa-api.onrender.com>. `docs/despliegue_render.md` detalla el proceso y el cierre del entregable 7.
+
+## AD-012 — Despliegue por API de Render y Atlas M0 (2026-11-25)
+
+**Decisión:** Crear el web service con `POST /v1/services` de la API pública de Render (la API no expone creación de Blueprints) sobre la rama `feat/backend-test-evidence`, con `rootDir=projects/backend`, plan `free`, región `oregon` y healthcheck `/api/health`. La base de datos es un cluster MongoDB Atlas M0 en AWS Oregon. Los secretos JWT se generan en Render; `MONGO_URI` y `SEED_PASSWORD` se inyectan como variables de entorno y nunca se versionan.
+
+**Motivo:** El usuario eligió Render y la opción gratuita de Atlas; un private service con MongoDB en Render implicaría un cargo mensual, y un Mongo local con túnel sería frágil.
+
+**Consecuencia:** `initialDeployHook` no existe en `servicePOST` y los *one-off jobs* de Render requieren plan de pago, así que el seed se ejecuta localmente con Node 26 contra la misma URI de Atlas (script idempotente). `render.yaml` se conserva como referencia para recrear el servicio desde el dashboard.
