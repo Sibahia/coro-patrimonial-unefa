@@ -66,7 +66,7 @@ npm run test:coverage     # 91,17 % líneas · 90,80 % funciones · 79,20 % rama
 
 - [Documento principal](docs/documento_principal.md) · [Estudio](docs/estudio_investigacion.md)
 - [Requerimientos y casos de uso](docs/requerimientos_casos_de_uso.md) · [Arquitectura y modelo de datos](docs/arquitectura_modelo_datos.md) · [Planificación y riesgos](docs/planificacion_riesgos.md)
-- [Manual de instalación](docs/manual_instalacion.md) · [Contrato de API](context/api_contracts.md)
+- [Manual de instalación](docs/manual_instalacion.md) · [Contrato de API](context/api_contracts.md) · [Despliegue en Render](docs/despliegue_render.md)
 - **Postman (referencia principal):** importar `docs/postman/coro-patrimonial-unefa.postman_collection.json` con `docs/postman/Local.postman_environment.json`. Evidencia: [Newman](docs/evidencias/postman-run.txt).
 - **Bruno (apoyo local):** `projects/backend/bruno/`. Evidencia: [ejecución local](docs/evidencias/bruno-local-run.txt).
 

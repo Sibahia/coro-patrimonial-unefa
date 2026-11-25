@@ -69,3 +69,11 @@ Historial de decisiones de diseño del proyecto Coro Patrimonial UNEFA.
 **Decisión:** `.github/workflows/backend-tests.yml` ejecuta `npm ci`, `npm test` y `npm run test:coverage` con `actions/setup-node` fijado en Node 26. Los reportes TAP y de cobertura se versionan en `docs/evidencias/`.
 
 **Motivo:** Hacer reproducible y pública la verificación del backend, y cerrar la brecha entre código probado y evidencia entregada.
+
+## AD-011 — Render como plataforma de despliegue (2026-11-25)
+
+**Decisión:** El backend se despliega en Render mediante el Blueprint `render.yaml` (web service Node 26, `rootDir: projects/backend`, `buildCommand: npm ci`, `startCommand: npm start`, `healthCheckPath: /api/health` y `initialDeployHook: npm run seed`). MongoDB se apunta a Atlas con `MONGO_URI` y los secretos JWT se generan en Render. El plan inicial es gratuito, con el directorio `/uploads` efímero; la persistencia con disco de pago queda documentada como mejora posterior.
+
+**Motivo:** El usuario eligió Render entre las alternativas planteadas; el Blueprint deja el despliegue reproducible y auditable desde el repositorio.
+
+**Consecuencia:** No se ejecutó el despliegue porque el entorno no tiene `RENDER_API_KEY` ni URI de Atlas. `docs/despliegue_render.md` detalla los pasos para crearlo y cerrar el entregable 7.

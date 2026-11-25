@@ -1,0 +1,33 @@
+# Render Blueprint — API Coro Patrimonial UNEFA
+# Crear desde: https://dashboard.render.com/ → New → Blueprint
+# La documentación completa está en docs/despliegue_render.md
+services:
+  - type: web
+    name: coro-patrimonial-unefa-api
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: projects/backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    initialDeployHook: npm run seed
+    envVars:
+      - key: NODE_VERSION
+        value: '26'
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SEED_PASSWORD
+        sync: false
+      - key: COOKIE_SECURE
+        value: 'true'
+      - key: UPLOAD_MAX_SIZE_MB
+        value: '10'

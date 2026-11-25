@@ -18,7 +18,7 @@ Ordenar la ejecución del backend y la producción de evidencias hasta dejar los
 | 2.3 | Planificación y riesgos | Gestión | 2026-11-25 | 2026-11-25 | ✅ Completado |
 | 3.1 | Colección Postman y entornos | QA | 2026-11-25 | 2026-11-26 | 🔄 En curso |
 | 3.2 | Colección Bruno de apoyo local | QA | 2026-11-25 | 2026-11-26 | ⏳ Pendiente |
-| 4.1 | Despliegue y URL pública del backend | DevOps | 2026-11-26 | 2026-11-27 | ⏳ Pendiente |
+| 4.1 | Despliegue y URL pública del backend (Render) | DevOps | 2026-11-26 | 2026-11-27 | 🔄 Blueprint listo, falta ejecutar |
 | 5.1 | Documento principal y estudio | Gestión | 2026-11-26 | 2026-11-27 | ✅ Completado |
 | 5.2 | Manual de instalación y matriz de evidencias | Documentación | 2026-11-25 | 2026-11-27 | 🔄 En curso |
 | 6.1 | PR, revisión y cierre de entregables | Todo el equipo | 2026-11-27 | 2026-11-28 | ⏳ Pendiente |
@@ -43,7 +43,7 @@ Ordenar la ejecución del backend y la producción de evidencias hasta dejar los
 | R-04 | Limitadores de tasa generan `429` en pruebas | Media | Medio | Mantener el volumen de peticiones de la suite bajo los límites y documentar el comportamiento | QA |
 | R-05 | Fuga de contenido no publicado por filtros de query | Baja | Crítico | Aplicar filtros públicos al final de listado y detalle; pruebas de regresión | Backend |
 | R-06 | Archivos huérfanos tras fallos de subida | Media | Medio | Limpieza de archivos recién guardados y `trackUpload` en pruebas | Backend |
-| R-07 | Ausencia de URL pública del backend | Alta | Alto | Definir plataforma de despliegue y publicar health check en README y matriz | DevOps |
+| R-07 | Ausencia de URL pública del backend | Media | Alto | Render elegido; `render.yaml` y guía listos. Ejecutar el Blueprint con credenciales de la cuenta y publicar health check en README y matriz | DevOps |
 | R-08 | La rúbrica no acepte Bruno como documentación de API | Media | Medio | Mantener Postman como referencia principal y Bruno solo como apoyo local | QA |
 | R-09 | Secretos expuestos en el repositorio público | Baja | Crítico | `.env` ignorado, `.env.example` sin valores reales y revisión de PR | DevOps |
 | R-10 | Pérdida de datos durante despliegue | Baja | Crítico | Respaldo previo con `mongodump` y copia de fuente según `AGENTS.md` | DevOps |
