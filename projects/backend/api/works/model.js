@@ -19,6 +19,10 @@ const workSchema = new Schema({
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
-workSchema.index({ title: 'text', composer: 'text' });
+// El campo `language` es metadato (código idiomático), no el override de idioma
+// del índice de texto. Mongoose lo detecta automáticamente como `language_override`
+// y Atlas rechaza valores como 'la'. Se usa un campo inexistente para forzar el
+// idioma por defecto del índice.
+workSchema.index({ title: 'text', composer: 'text' }, { language_override: 'textLanguage' });
 
 export default mongoose.model('Work', workSchema);
